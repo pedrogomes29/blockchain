@@ -1,0 +1,6 @@
+[submodule "blockchain_node"]
+	path = blockchain_node
+	url = git@github.com:pedrogomes29/blockchain_node.git
+[submodule "blockchain_wallet"]
+	path = blockchain_wallet
+	url = git@github.com:pedrogomes29/blockchain_wallet.git

@@ -1,0 +1,88 @@
+version: "3"
+
+services:
+  node1:
+    build:
+      context: ./blockchain_node
+      target: build
+    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp
+    networks:
+      node_network:
+        ipv4_address: 172.16.238.11
+    healthcheck:
+      test: ["CMD", "bash", "-c", "printf 'GET / HTTP/1.1\n\n' > /dev/tcp/127.0.0.1/8333"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  node2:
+    build:
+      context: ./blockchain_node
+      target: build
+    depends_on:
+      node1:
+        condition: service_healthy
+    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp -seeds 172.16.238.11
+    networks:
+      node_network:
+        ipv4_address: 172.16.238.12
+    healthcheck:
+      test: ["CMD", "bash", "-c", "printf 'GET / HTTP/1.1\n\n' > /dev/tcp/127.0.0.1/8333"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  node3:
+    build:
+      context: ./blockchain_node
+      target: build
+    depends_on:
+      node2:
+        condition: service_healthy
+    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp -seeds 172.16.238.12
+    networks:
+      node_network:
+        ipv4_address: 172.16.238.13
+    healthcheck:
+      test: ["CMD", "bash", "-c", "printf 'GET / HTTP/1.1\n\n' > /dev/tcp/127.0.0.1/8333"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+
+  node4:
+    build:
+      context: ./blockchain_node
+      target: build
+    depends_on:
+      node3:
+        condition: service_healthy
+    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp -seeds 172.16.238.13,172.16.238.11
+    networks:
+      node_network:
+        ipv4_address: 172.16.238.14
+    healthcheck:
+      test: ["CMD", "bash", "-c", "printf 'GET / HTTP/1.1\n\n' > /dev/tcp/127.0.0.1/8333"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+      
+  wallet:
+    build:
+      context: ./blockchain_wallet
+      target: build
+    command: tail -f /dev/null # Keeps the container running, but not doing anything
+    networks:
+      node_network:
+        ipv4_address: 172.16.238.15
+
+networks:
+  node_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.238.0/24
