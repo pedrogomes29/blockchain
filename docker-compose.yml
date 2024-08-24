@@ -5,7 +5,7 @@ services:
     build:
       context: ./blockchain_node
       target: build
-    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp
+    command: ./node -miner $MINER_ADDRESS
     networks:
       node_network:
         ipv4_address: 172.16.238.11
@@ -23,7 +23,7 @@ services:
     depends_on:
       node1:
         condition: service_healthy
-    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp -seeds 172.16.238.11
+    command: ./node -miner $MINER_ADDRESS -seeds 172.16.238.11
     networks:
       node_network:
         ipv4_address: 172.16.238.12
@@ -41,7 +41,7 @@ services:
     depends_on:
       node2:
         condition: service_healthy
-    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp -seeds 172.16.238.12
+    command: ./node -miner $MINER_ADDRESS -seeds 172.16.238.12
     networks:
       node_network:
         ipv4_address: 172.16.238.13
@@ -60,7 +60,7 @@ services:
     depends_on:
       node3:
         condition: service_healthy
-    command: ./node -miner 18iKLjdH51mZhg8yM3H6JLZ1Wdfjv7L9Vp -seeds 172.16.238.13,172.16.238.11
+    command: ./node -miner $MINER_ADDRESS -seeds 172.16.238.13,172.16.238.11
     networks:
       node_network:
         ipv4_address: 172.16.238.14
@@ -70,12 +70,13 @@ services:
       timeout: 5s
       retries: 10
       start_period: 5s
-      
+
   wallet:
     build:
       context: ./blockchain_wallet
       target: build
-    command: tail -f /dev/null # Keeps the container running, but not doing anything
+    volumes:
+      - ./blockchain_wallet/wallets:/blockchain/wallet/wallets
     networks:
       node_network:
         ipv4_address: 172.16.238.15
